@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use App\Http\Requests\StoreVideoRequest;
 use App\Http\Requests\UpdateVideoRequest;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class VideoController extends Controller
 {
@@ -14,8 +16,8 @@ class VideoController extends Controller
      */
     public function index()
     {
-        //
-        return Inertia::render('Video/List');
+        $videos = Video::all();
+        return Inertia::render('Video/List', ['videos' => $videos]);
     }
 
     /**
@@ -33,7 +35,20 @@ class VideoController extends Controller
     public function store(StoreVideoRequest $request)
     {
         //
+        ['title' => $title] = $request->validated();
+        $slug = Str::slug($title);
         
+        $file = $request->file('file');
+        $path = $file->store('videos', 'public');
+
+        $video = new Video();
+        $video->url = $path;
+        $video->title = $title;
+        $video->slug = $slug;
+        $video->author()->associate($request->user());
+        $video->save();
+        
+        return new JsonResponse([]);
     }
 
     /**
@@ -42,7 +57,7 @@ class VideoController extends Controller
     public function show(Video $video)
     {
         //
-        return Inertia::render('Video/Show');
+        return Inertia::render('Video/Show', ['video' => $video]);
     }
 
     /**

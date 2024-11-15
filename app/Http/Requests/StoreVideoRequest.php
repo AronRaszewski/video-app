@@ -12,7 +12,7 @@ class StoreVideoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -25,7 +25,7 @@ class StoreVideoRequest extends FormRequest
         return [
             //
             'title' => 'required|bail|string|max:100',
-            'video' => ['required', File::types(['mp3', 'wav', 'avi'])->max(50 * 1024)]
+            'file' => ['required', File::types(['mp3', 'wav', 'avi', 'mp4'])->max(50 * 1024)]
         ];
     }
 }

@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('title', 100);
             $table->string('slug', 100)->nullable();
             $table->string('url', 255);
-            $table->foreign('user_id')->references('id')->on('users');
+            
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
