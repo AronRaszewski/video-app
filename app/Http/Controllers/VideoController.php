@@ -35,20 +35,22 @@ class VideoController extends Controller
     public function store(StoreVideoRequest $request)
     {
         //
-        ['title' => $title] = $request->validated();
+        ['title' => $title, 'description' => $description] = $request->validated();
         $slug = Str::slug($title);
         
         $file = $request->file('file');
+
         $path = $file->store('videos', 'public');
 
         $video = new Video();
         $video->url = $path;
         $video->title = $title;
         $video->slug = $slug;
+        $video->description = $description;
         $video->author()->associate($request->user());
         $video->save();
         
-        return new JsonResponse([]);
+        return to_route('video.show', ['video' => $video->id]);
     }
 
     /**
@@ -56,7 +58,8 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-        //
+        $video->url = asset($video->url);
+        $video->load(['author']);
         return Inertia::render('Video/Show', ['video' => $video]);
     }
 

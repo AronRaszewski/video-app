@@ -13,13 +13,20 @@
               </h1>
       
               <!-- Navigation Links -->
-              <nav class="space-x-4">
-                <Link href="/" class="hover:underline">Home</Link>
-                <Link href="/categories" class="hover:underline">Categories</Link>
-                <Link href="/playlists" class="hover:underline">Playlists</Link>
-                <Link :href="route('video.create')" class="hover:underline" v-if="$page.props.auth.user">
-                  Dodaj
-                </Link>
+              <nav class="space-x-4 flex items-end">
+                      <Link class="flex flex-col items-center" :href="route('dashboard')">
+                        <svg-icon type="mdi" :path="mdiHome" />
+                        Strona główna
+                      </Link>
+                      <Link class="flex flex-col items-center" :href="route('video.index')">
+                        <svg-icon type="mdi" :path="mdiListBox" />
+                        Lista
+                      </Link>
+                      <Link class="flex flex-col items-center" :href="route('video.create')"  v-if="$page.props.auth.user">
+                        <svg-icon type="mdi" :path="mdiPlusBox" />
+                        Dodaj
+                      </Link>
+                
               </nav>
       
               <!-- Dark Mode Toggle -->
@@ -35,7 +42,7 @@
                     <svg-icon type="mdi" :path="mdiLogout" />
                 </Link>
                 </template>
-                <template>
+                <template v-else>
                   <Link :href="route('login')" class="hover:underline">
                       <svg-icon type="mdi" :path="mdiLogin"/>
                   </Link>
@@ -70,7 +77,7 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import { Link, router } from '@inertiajs/vue3';
-import { mdiAccountKey, mdiAccountPlus, mdiLogin, mdiLogout, mdiWeatherNight, mdiWeatherSunny } from '@mdi/js';
+import { mdiAccountKey, mdiAccountPlus, mdiHome, mdiListBox, mdiLogin, mdiLogout, mdiPlusBox, mdiWeatherNight, mdiWeatherSunny } from '@mdi/js';
 
   
   // State for dark mode

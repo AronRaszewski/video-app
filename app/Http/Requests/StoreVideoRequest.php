@@ -25,7 +25,8 @@ class StoreVideoRequest extends FormRequest
         return [
             //
             'title' => 'required|bail|string|max:100',
-            'file' => ['required', File::types(['mp3', 'wav', 'avi', 'mp4'])->max(50 * 1024)]
+            'file' => ['required', File::types(['mp3', 'wav', 'avi', 'mp4'])->max(50 * 1024)],
+            'description' => 'required|string|max:255'
         ];
     }
 }
