@@ -6,6 +6,7 @@ use App\Models\Video;
 use App\Http\Requests\StoreVideoRequest;
 use App\Http\Requests\UpdateVideoRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 
@@ -14,10 +15,18 @@ class VideoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $videos = Video::all();
-        return Inertia::render('Video/List', ['videos' => $videos]);
+        $query = $request->query();
+        
+        if (isset($query['title'])) { // Wyszukiwanie po tytule, prawdopodobnie w przyszłości zmienię strukturę działania tego modułu
+            $title = $query['title'];
+            $videos = Video::query()->where('title', 'like',  '%' . $title . '%')->get();
+        } else {
+            $videos = Video::all();
+
+        }
+        return Inertia::render('Video/List', ['videos' => $videos])->with('query', $query);
     }
 
     /**

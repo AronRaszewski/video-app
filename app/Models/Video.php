@@ -10,6 +10,7 @@ class Video extends Model
 {
     use HasFactory;
 
+    protected $with = ['author'];
 
     /**
      * Get the author that owns the Video

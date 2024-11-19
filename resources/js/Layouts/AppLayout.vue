@@ -28,6 +28,8 @@
                       </Link>
                 
               </nav>
+
+              <VideoSearch v-bind="$page.props.query" />
       
               <!-- Dark Mode Toggle -->
               <button @click="toggleDarkMode" class="ml-4 p-2 rounded-full bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-50">
@@ -78,6 +80,7 @@
   import { ref, onMounted } from 'vue';
   import { Link, router } from '@inertiajs/vue3';
 import { mdiAccountKey, mdiAccountPlus, mdiHome, mdiListBox, mdiLogin, mdiLogout, mdiPlusBox, mdiWeatherNight, mdiWeatherSunny } from '@mdi/js';
+import VideoSearch from '@/Components/VideoSearch.vue';
 
   
   // State for dark mode

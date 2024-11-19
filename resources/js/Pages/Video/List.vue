@@ -12,12 +12,22 @@ import { Link } from '@inertiajs/vue3';
             </h2>
         </template>
 
-        <Panel v-for="video in $page.props.videos">
-            <template #header>
-                <Link :href="route('video.show', video.id)">
-                {{video.title}}
-            </Link>
-            </template>
-        </Panel>
+        <div class="grid lg:grid-cols-3 gap-1">
+            <Panel v-if="$page.props.videos.length > 0" v-for="video in $page.props.videos">
+                <template #header>
+                    <Link :href="route('video.show', video.id)">
+                    {{video.title}}
+                </Link>
+                </template>
+                {{ video.description }}
+                <div class="text-sm text-gray-500">
+                    Autor: {{ video.author.name }}
+                </div>
+            </Panel>
+            <Panel class="col-span-full" v-else>
+                Brak video. Możesz przesłać swoje video!
+            </Panel>
+            
+        </div>
     </AppLayout>
 </template>
