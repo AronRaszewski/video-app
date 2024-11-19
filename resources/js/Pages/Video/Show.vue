@@ -1,5 +1,6 @@
 <script setup>
 import Panel from '@/Components/Panel.vue';
+import RateStars from '@/Components/RateStars.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 defineProps({
@@ -25,6 +26,9 @@ defineProps({
                 <div>
                     Autor: {{ video.author.name }}
 
+                </div>
+                <div>
+                    <RateStars :value="4.88" @submit="data => console.log(data)" />
                 </div>
                 <div>
                     Dodano: {{ video.created_at }}
