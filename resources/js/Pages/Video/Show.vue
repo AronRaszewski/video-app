@@ -28,7 +28,7 @@ defineProps({
 
                 </div>
                 <div>
-                    <RateStars :value="4.88" @submit="data => console.log(data)" />
+                    <RateStars :value="video.rates_avg_rate" @submit="data => console.log(data)" />
                 </div>
                 <div>
                     Dodano: {{ video.created_at }}

@@ -59,17 +59,27 @@ class VideoController extends Controller
         $video->author()->associate($request->user());
         $video->save();
         
+        
         return to_route('video.show', ['video' => $video->id]);
+    }
+
+    public function upload()
+    {
+
+
+        // zwróć url
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Video $video)
+    public function show(Request $request, Video $video)
     {
         $video->url = asset($video->url);
-        $video->load(['author']);
-        return Inertia::render('Video/Show', ['video' => $video]);
+        $video->load(['author'])->loadAvg('rates', 'rate');
+        $video->rates_avg_rate = $video->rates_avg_rate ?? 0;
+        $already_rated = $video->rates()->where('user_id', $request->user()->id);
+        return Inertia::render('Video/Show', ['video' => $video, 'already_rated' => $already_rated]);
     }
 
     /**
