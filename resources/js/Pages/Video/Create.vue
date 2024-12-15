@@ -5,49 +5,41 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import Panel from '@/Components/Panel.vue';
 import Dropzone from 'dropzone';
 import { onMounted, reactive } from 'vue';
 import { mdiUpload } from '@mdi/js';
+import Cookie from 'js-cookie';
 
 let dropzone;
 
 const form = useForm({
     title: '',
-    file: null,
+    file: '',
     description: ''
 })
+
 
 onMounted(() => {
     dropzone = new Dropzone('div#video-dropzone', {
         maxFiles: 1,
-        url: route('video.store'),
-        addRemoveLinks: true,
-        autoProcessQueue: false,
+        url: route('video.upload'),
+        headers: {
+            'X-XSRF-TOKEN': Cookie.get('XSRF-TOKEN')
+        },
         chunking: true,
         chunkSize: 1024*1024*2, // 2 MB
         init() {
-            this.on('addedfile', file => {
-                console.log(file);
-                form.file = file;
+            this.on('success', file => {
+                form.file = file.xhr.response;
             })
         }
     });
 })
 
 function submit() {
-    const formData = new FormData();
-
-    formData.append('title', form.title);
-    formData.append('description', form.description);
-    if (form.file) {
-        formData.append('file', form.file);
-    }
-
-    router.post(route('video.store'), formData, {
-        forceFormData: true
-    })
+    form.post(route('video.store'));
 
 }
 </script>
