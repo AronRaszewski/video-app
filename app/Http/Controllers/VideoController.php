@@ -97,7 +97,7 @@ class VideoController extends Controller
         $video->url = asset($video->url);
         $video->load(['author'])->loadAvg('rates', 'rate');
         $video->rates_avg_rate = $video->rates_avg_rate ?? 0;
-        $already_rated = $video->rates()->where('user_id', $request->user()->id);
+        $already_rated = ($request->user()) ? $video->rates()->where('user_id', $request->user()->id)->first()?->rate : null;
         return Inertia::render('Video/Show', ['video' => $video, 'already_rated' => $already_rated]);
     }
 

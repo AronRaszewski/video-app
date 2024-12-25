@@ -16,8 +16,10 @@ Route::middleware([
 
     Route::prefix('video/{video}/rate')->controller(RateController::class)->group(function () {
 
-        Route::post('/', 'store')->name('ratings.store'); // Dodanie oceny
-        Route::put('/', 'update')->name('ratings.update'); // Modyfikacja oceny
+        Route::post('/', 'rate')->name('ratings.rate'); // Ocena lub zmiana oceny
+
+        // Route::post('/', 'store')->name('ratings.store'); // Dodanie oceny
+        // Route::put('/', 'update')->name('ratings.update'); // Modyfikacja oceny
         Route::delete('/', 'destroy')->name('ratings.destroy'); // Usunięcie oceny
 
     });

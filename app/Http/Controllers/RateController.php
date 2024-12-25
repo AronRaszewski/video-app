@@ -8,21 +8,58 @@ use Illuminate\Http\Request;
 
 class RateController extends Controller
 {
+
+    public function rate(Request $request, Video $video) {
+        $validated = $request->validate([
+            'rate' => 'required|integer|min:1|max:5',
+        ]);
+
+        $user = $request->user();
+
+        $isCreated = false;
+
+        // Sprawdź czy ocena istnieje
+        $rate = Rate::where('user_id', $user->id)->where('video_id', $video->id)->first();
+
+        // Jeśli nie - utwórz
+        if ($rate === null) {
+            $rate = new Rate();
+            $rate->user()->associate($user);
+            $rate->video()->associate($video);
+
+            $isCreated = true;
+        }
+
+
+        // Zapisz do bazy danych
+        $rate->rate = $validated['rate'];
+        $rate->save();
+
+        $message = $isCreated ? 'Dziękujemy za ocenienie filmu' : 'Pomyślnie zmieniono ocenę';
+
+        // Wyślij wiadomość użytkownikowi
+        return response()->json(['message' => $message]);
+    }
+
     /**
      * Dodaj ocenę dla filmu.
      */
     public function store(Request $request, Video $video)
     {
         $validated = $request->validate([
-            'stars' => 'required|integer|min:1|max:5',
+            'rate' => 'required|integer|min:1|max:5',
         ]);
 
-        $rating = Rate::updateOrCreate(
-            ['user_id' => auth()->id(), 'video_id' => $video->id],
-            ['stars' => $validated['stars']]
-        );
+        if ($video->author->id === $request->user()->id) {
+            return response()->json(['message' => 'Nie możesz oceniać własnych filmów'], 403);
+        }
 
-        return response()->json(['message' => 'Rating added successfully', 'rating' => $rating], 201);
+        $rate = new Rate(['rate' => $validated['rate']]);
+        $rate->video()->associate($video);
+        $rate->user()->associate($request->user());
+        $rate->save();
+
+        return response()->json(['message' => 'Dziękujemy za ocenienie filmu']);
     }
 
     /**
@@ -31,16 +68,16 @@ class RateController extends Controller
     public function update(Request $request, Video $video)
     {
         $validated = $request->validate([
-            'stars' => 'required|integer|min:1|max:5',
+            'rate' => 'required|integer|min:1|max:5',
         ]);
 
         $rating = Rate::where('user_id', auth()->id())
             ->where('video_id', $video->id)
             ->firstOrFail();
 
-        $rating->update(['stars' => $validated['stars']]);
+        $rating->update(['rate' => $validated['rate']]);
 
-        return response()->json(['message' => 'Rating updated successfully', 'rating' => $rating]);
+        return response()->json(['message' => 'Zmieniono ocenę', 'rating' => $rating]);
     }
 
     /**
@@ -54,7 +91,7 @@ class RateController extends Controller
 
         $rating->delete();
 
-        return response()->json(['message' => 'Rating removed successfully']);
+        return response()->json(['message' => 'Usunięto ocenę']);
     }
 
 }

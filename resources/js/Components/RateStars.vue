@@ -12,6 +12,7 @@ const halfStar = computed(() => {
     return (value - Math.floor(value)) >= 0.5
 })
 
+
 const emit = defineEmits(['submit'])
 </script>
 <template>
@@ -30,7 +31,7 @@ const emit = defineEmits(['submit'])
             </div>
         </div>
         <div class="text-sm text-slate-600 dark:text-slate-400">
-            {{ value.toFixed(2) }} / 5.00
+            {{ value }} / 5.00
         </div>
     </div>
 </template>
