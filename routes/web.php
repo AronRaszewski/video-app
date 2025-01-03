@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Foundation\Application;
@@ -23,6 +24,8 @@ Route::middleware([
         Route::delete('/', 'destroy')->name('ratings.destroy'); // Usunięcie oceny
 
     });
+
+    Route::resource('video/{video}/comments', CommentController::class, ['only' => ['store']]);
 });
 Route::get('/', function () {
     return Inertia::render('Dashboard');

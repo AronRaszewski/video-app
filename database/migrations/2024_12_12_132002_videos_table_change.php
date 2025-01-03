@@ -12,6 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         //
+        Schema::table('videos', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+
+        });
     }
 
     /**

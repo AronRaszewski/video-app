@@ -4,6 +4,7 @@ import RateStars from '@/Components/RateStars.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
+import CommentsSection from './Partials/CommentsSection.vue';
 
 const {video, already_rated} = defineProps({
     video: {
@@ -66,37 +67,56 @@ async function saveRate(rate)
     }
 }
 
+async function saveComment(data)
+{
+    try {
+        const res = await axios.post(route('comments.store', {video: video.id}), { content: data });
+        router.reload({only: ['video.comments']});
+
+    } catch (err) {
+        alert('Wystąpił błąd')
+        console.log(err);
+    }
+
+}
+
 </script>
 <template>
     <AppLayout>
-       <Panel>
-            <template #header>
-                {{ video.title }}
-            </template>
+        <div class="grid md:grid-cols-[60%_40%]">
+            <Panel>
+                 <template #header>
+                     {{ video.title }}
+                 </template>
+     
+                 <video controls class="mx-auto">
+                     <source  :src="video.url"/>
+                     Wystąpił błąd.
+                 </video>
+                 <div v-if="video.description">
+                     Opis: {{ video.description }}
+                 </div>
+                 <div class="text-sm flex justify-between">
+                     <div>
+                         Autor: {{ video.author.name }}
+     
+                     </div>
+                     <div>
+                         <RateStars :value="video.rates_avg_rate" @submit="saveRate" />
+                         <div v-if="already_rated">
+     
+                             Twoja ocena: {{ already_rated }} <button href="#" @click="deleteRate()" class="text-blue-300">Usuń</button>
+                         </div>
+                     </div>
+                     <div>
+                         Dodano: {{ video.created_at }}
+                     </div>
+                 </div>
+            </Panel>
+            <Panel>
+                 <CommentsSection :comments="video.comments" @submit-comment="content => saveComment(content)" />
+            </Panel>
 
-            <video controls class="mx-auto">
-                <source  :src="video.url"/>
-                Wystąpił błąd.
-            </video>
-            <div v-if="video.description">
-                Opis: {{ video.description }}
-            </div>
-            <div class="text-sm flex justify-between">
-                <div>
-                    Autor: {{ video.author.name }}
-
-                </div>
-                <div>
-                    <RateStars :value="video.rates_avg_rate" @submit="saveRate" />
-                    <div v-if="already_rated">
-
-                        Twoja ocena: {{ already_rated }} <button href="#" @click="deleteRate()" class="text-blue-300">Usuń</button>
-                    </div>
-                </div>
-                <div>
-                    Dodano: {{ video.created_at }}
-                </div>
-            </div>
-       </Panel>
+        </div>
     </AppLayout>
 </template>

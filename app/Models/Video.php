@@ -32,4 +32,9 @@ class Video extends Model
     {
         return $this->hasMany(Rate::class, 'video_id');
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class)->whereNull('replied_to')->with('replies');
+    }
 }
