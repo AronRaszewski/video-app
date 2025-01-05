@@ -26,7 +26,7 @@ class StoreVideoRequest extends FormRequest
             //
             'title' => 'required|bail|string|max:100',
             'file' => ['required', 'json'],
-            'description' => 'string|max:255'
+            'description' => 'nullable|string|max:255'
         ];
     }
 }

@@ -8,10 +8,13 @@ use App\Http\Requests\UpdateVideoRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use ZipArchive;
 
 class VideoController extends Controller
 {
@@ -53,10 +56,11 @@ class VideoController extends Controller
 
 
         $video = new Video();
-        $video->url = asset('storage/' . $file->path . $file->name);
+        $video->url = 'storage/' . $file->path . $file->name;
+        Log::debug($video->url, ['store']);
         $video->title = $title;
         $video->slug = $slug;
-        $video->description = $description;
+        $video->description = $description ?? '';
         $video->author()->associate($request->user());
         $video->save();
 
@@ -94,10 +98,27 @@ class VideoController extends Controller
      */
     public function show(Request $request, Video $video)
     {
+        
+        if (!File::exists($video->url)) {
+            $zip = new ZipArchive();
+            $zip->open($this->compressedAssetPath($video->url));
+            Log::debug($video->url, ['show']);
+            
+            $directory = explode('/', public_path($video->url));
+            $file = array_pop($directory);
+            $directory = implode('/', $directory);
+
+            $zip->extractTo($directory, $file);
+
+        }
+        
+
+
         $video->url = asset($video->url);
         $video->load(['author', 'comments'])->loadAvg('rates', 'rate');
         $video->rates_avg_rate = $video->rates_avg_rate ?? 0;
         $already_rated = ($request->user()) ? $video->rates()->where('user_id', $request->user()->id)->first()?->rate : null;
+
         return Inertia::render('Video/Show', ['video' => $video, 'already_rated' => $already_rated]);
     }
 
@@ -146,9 +167,31 @@ class VideoController extends Controller
         // Build the file path
         $filePath = "upload/{$mime}/{$dateFolder}/";
         $finalPath = storage_path("app/public/" . $filePath);
+        
 
         // move the file name
         $file->move($finalPath, $fileName);
+
+
+
+
+        $zip = new ZipArchive();
+
+        if (!File::exists(storage_path("app/compressed")))
+            File::makeDirectory(storage_path("app/compressed"));
+
+
+        if ($zip->open($this->compressedPath($filePath, $fileName), ZipArchive::CREATE)) {
+            $zip->addFile($finalPath . $fileName, $fileName);
+            
+            $zip->close();
+
+            File::delete($finalPath . $fileName);
+
+        }
+
+        
+
 
         return response()->json([
             'path' => $filePath,
@@ -171,5 +214,16 @@ class VideoController extends Controller
         $filename .= "_" . md5(time()) . "." . $extension;
 
         return $filename;
+    }
+
+    protected function compressedPath($path, $name) {
+        $hash = md5('storage/' . $path . $name);
+        Log::debug('storage/' . $path . $name, ['compressedPath']);
+        return storage_path("app/compressed/$hash.zip");
+    }
+
+    protected function compressedAssetPath($asset) {
+        $hash = md5($asset);
+        return storage_path("app/compressed/$hash.zip");
     }
 }
