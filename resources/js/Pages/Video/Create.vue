@@ -118,7 +118,7 @@ function save(data) {
                         <option value="restricted">Ograniczony</option>
                         <option value="private">Prywatny</option>
                     </select>
-                    <div class="flex gap-1">{{ visibilityTip }}
+                    <div class="flex gap-1">{{ visibilityTip }} <template v-if="form.visibility === 'restricted'">({{ form.grantAccessTo.length }})</template>
                         <button class="flex gap-1 text-blue-700 dark:text-blue-300" type="button" v-if="form.visibility === 'restricted'" @click="selectUsersModalVisible = true">
                             <svg-icon type="mdi" :path="mdiPlusCircle" />
                             Kliknij aby wybrać
