@@ -5,19 +5,36 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { router, useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import Panel from '@/Components/Panel.vue';
 import Dropzone from 'dropzone';
-import { onMounted, reactive } from 'vue';
-import { mdiUpload } from '@mdi/js';
+import { computed, onMounted, reactive, ref } from 'vue';
+import { mdiMagnify, mdiPlusCircle, mdiUpload } from '@mdi/js';
 import Cookie from 'js-cookie';
+import Modal from '@/Components/Modal.vue';
+import Checkbox from '@/Components/Checkbox.vue';
+import SelectUsersToGrantAccessModal from './Partials/SelectUsersToGrantAccessModal.vue';
 
 let dropzone;
 
 const form = useForm({
     title: '',
     file: '',
-    description: ''
+    description: '',
+    visibility: 'public',
+    grantAccessTo: []
+})
+
+const selectUsersModalVisible = ref(false);
+
+
+
+const visibilityTip = computed(() => {
+    return {
+        'public': 'Widoczny dla wszystkich',
+        'restricted': 'Widoczny dla wybranych użytkowników',
+        'private': 'Widoczny tylko dla Ciebie'
+    }[form.visibility];
 })
 
 
@@ -30,6 +47,7 @@ onMounted(() => {
         },
         chunking: true,
         chunkSize: 1024*1024*2, // 2 MB
+        acceptedFiles: 'video/*',
         init() {
             this.on('success', file => {
                 form.file = file.xhr.response;
@@ -41,6 +59,11 @@ onMounted(() => {
 function submit() {
     form.post(route('video.store'));
 
+}
+
+function save(data) {
+    form.grantAccessTo = data;
+    selectUsersModalVisible.value = false;
 }
 </script>
 
@@ -84,6 +107,25 @@ function submit() {
                     
                     <InputError :message=form.errors.file />
                 </div>
+
+                <div class="text-right">
+                    <InputLabel for="visibility">Widoczność</InputLabel>
+                </div>
+                <div>
+                    
+                    <select id="visibility" class="dark:bg-slate-900" v-model="form.visibility">
+                        <option value="public">Publiczny</option>
+                        <option value="restricted">Ograniczony</option>
+                        <option value="private">Prywatny</option>
+                    </select>
+                    <div class="flex gap-1">{{ visibilityTip }}
+                        <button class="flex gap-1 text-blue-700 dark:text-blue-300" type="button" v-if="form.visibility === 'restricted'" @click="selectUsersModalVisible = true">
+                            <svg-icon type="mdi" :path="mdiPlusCircle" />
+                            Kliknij aby wybrać
+                        </button>
+                    
+                    </div>
+                </div>
                 
                 <div class="col-start-2">
                     <PrimaryButton type="submit">Wyślij</PrimaryButton>
@@ -92,4 +134,5 @@ function submit() {
             </form>
         </Panel>
     </AppLayout>
+    <SelectUsersToGrantAccessModal :visible="selectUsersModalVisible" @save="save" />
 </template>

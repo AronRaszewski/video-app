@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use App\Http\Requests\StoreVideoRequest;
 use App\Http\Requests\UpdateVideoRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
@@ -31,6 +33,11 @@ class VideoController extends Controller
         } else {
             $videos = Video::all();
         }
+
+        $videos = $videos->filter(function ($video) {
+            return Gate::allows('show_video', $video);
+        });
+
         return Inertia::render('Video/List', ['videos' => $videos])->with('query', $query);
     }
 
@@ -49,9 +56,13 @@ class VideoController extends Controller
     public function store(StoreVideoRequest $request)
     {
         //
-        ['title' => $title, 'description' => $description, 'file' => $file] = $request->validated();
+        ['title' => $title, 
+        'description' => $description, 
+        'file' => $file, 
+        'visibility' => $visibility, 
+        'grantAccessTo' => $grantAccessTo] = $request->validated();
         $file = json_decode($file);
-    
+        
         $slug = Str::slug($title);
 
 
@@ -61,8 +72,14 @@ class VideoController extends Controller
         $video->title = $title;
         $video->slug = $slug;
         $video->description = $description ?? '';
+        $video->visibility = $visibility;
         $video->author()->associate($request->user());
         $video->save();
+        
+        $video->allowed()->attach($grantAccessTo);
+
+
+        
 
 
         return to_route('video.show', ['video' => $video->id]);
@@ -74,6 +91,7 @@ class VideoController extends Controller
         if ($receiver->isUploaded() === false) {
             throw new UploadMissingFileException();
         }
+
         // receive the file
         $save = $receiver->receive();
 
@@ -98,6 +116,10 @@ class VideoController extends Controller
      */
     public function show(Request $request, Video $video)
     {
+
+        if (!Gate::allows('show_video', $video)) {
+            return Inertia::render('Video/Unavailable');
+        }
         
         if (!File::exists($video->url)) {
             $zip = new ZipArchive();

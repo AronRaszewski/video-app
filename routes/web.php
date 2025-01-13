@@ -3,7 +3,9 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\VideoController;
+use App\Models\User;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,3 +33,7 @@ Route::get('/', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
 Route::resource('video', VideoController::class, ['only' => ['index', 'show']]);
+
+Route::get('search-users/{nickname}', function (Request $request, string $nickname) {
+    return User::whereLike('name', '%' . $nickname . '%')->get(['id', 'name']);
+})->name('search.users');

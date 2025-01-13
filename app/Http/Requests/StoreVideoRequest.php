@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\VisibilityLevel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 
 class StoreVideoRequest extends FormRequest
@@ -26,7 +28,10 @@ class StoreVideoRequest extends FormRequest
             //
             'title' => 'required|bail|string|max:100',
             'file' => ['required', 'json'],
-            'description' => 'nullable|string|max:255'
+            'description' => 'nullable|string|max:255',
+            'visibility' => ['required', Rule::in(VisibilityLevel::cases())],
+            'grantAccessTo' => ['required', 'array'],
+            'grantAccessTo.*' => ['exists:users,id']
         ];
     }
 }
