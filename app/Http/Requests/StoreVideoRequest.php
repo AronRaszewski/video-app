@@ -30,7 +30,7 @@ class StoreVideoRequest extends FormRequest
             'file' => ['required', 'json'],
             'description' => 'nullable|string|max:255',
             'visibility' => ['required', Rule::in(VisibilityLevel::cases())],
-            'grantAccessTo' => ['required', 'array'],
+            'grantAccessTo' => ['required_if:visibility,restricted', 'array'],
             'grantAccessTo.*' => ['exists:users,id']
         ];
     }
