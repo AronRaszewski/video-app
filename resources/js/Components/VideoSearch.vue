@@ -1,7 +1,8 @@
 <script setup>
-import { mdiMagnify } from '@mdi/js';
+import { mdiClose, mdiMagnify } from '@mdi/js';
 import TextInput from './TextInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 const props = defineProps({
     title: {
@@ -9,6 +10,8 @@ const props = defineProps({
         
     }
 })
+
+const mobileCollapsed = ref(true);
 
 const form = useForm({
     title: props.title
@@ -21,14 +24,20 @@ function submit()
 </script>
 
 <template>
-    <div class="relative">
-        <form @submit.prevent="submit">
+    <button class=" md:hidden" @click="mobileCollapsed = false">
+        <svg-icon type="mdi" :path="mdiMagnify" />
+    </button>
+    <div class="fixed z-10 top-0 inset-x-0 flex md:static py-4 bg-black/80 md:bg-transparent" :class="{'hidden md:flex': mobileCollapsed}">
+        <form @submit.prevent="submit" class="flex-grow relative ">
             <div class="absolute h-full left-1 flex items-center text-blue-500 dark:text-white pointer-events-none">
                 <svg-icon type="mdi" :path="mdiMagnify" />
     
             </div>
-            <TextInput class="pl-7" v-model="form.title" />
+            <TextInput class="pl-7 w-full" v-model="form.title" placeholder="Szukaj" />
 
         </form>
+        <button class=" md:hidden" @click="mobileCollapsed = true;">
+            <svg-icon type="mdi" :path="mdiClose" class="" />
+        </button>
     </div>
 </template>

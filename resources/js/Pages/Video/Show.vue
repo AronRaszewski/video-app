@@ -71,7 +71,7 @@ async function saveComment(data)
 {
     try {
         const res = await axios.post(route('comments.store', {video: video.id}), { content: data });
-        router.reload({only: ['video.comments']});
+        router.reload();
 
     } catch (err) {
         alert('Wystąpił błąd')

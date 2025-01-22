@@ -1,9 +1,9 @@
 <template>
     <header class="text-lg font-semibold">Komentarze ({{ comments.length }})</header>
-    <form @submit.prevent="emit('submit-comment', writeComment)">
+    <form @submit.prevent="emit('submit-comment', writeComment); writeComment = ''">
         <header class="text-lg font-semibold">Napisz komentarz</header>
         <textarea class="w-full bg-gray-100 dark:bg-gray-900" placeholder="Treść komentarza" v-model="writeComment"></textarea>
-        <PrimaryButton type="submit" class="mt-2">Wyślij</PrimaryButton>
+        <PrimaryButton :disabled="writeComment.length === 0" type="submit" class="mt-2">Wyślij</PrimaryButton>
     </form>
 
     <Comment v-for="comment in comments" v-bind="comment"></Comment>
