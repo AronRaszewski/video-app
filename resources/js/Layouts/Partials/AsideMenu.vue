@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { mdiAccountPlus, mdiClose, mdiHome, mdiListBox, mdiLogin, mdiLogout, mdiPlusBox, mdiWeatherNight, mdiWeatherSunny } from '@mdi/js';
+import { mdiAccountDetails, mdiAccountPlus, mdiClose, mdiHome, mdiListBox, mdiLogin, mdiLogout, mdiPlusBox, mdiWeatherNight, mdiWeatherSunny } from '@mdi/js';
 import VideoSearch from '@/Components/VideoSearch.vue';
 defineProps({
     isCollapsed: Boolean
@@ -10,7 +10,7 @@ const emit = defineEmits(['collapse'])
 </script>
 <template>
     <div id="aside" 
-       class="fixed h-screen bg-gray-100 dark:bg-gray-800 text-sky-900 dark:text-sky-100 top-0 left-0 w-80 z-10 duration-300 border-r"
+       class="fixed h-screen px-2 bg-gray-100 dark:bg-gray-800 text-sky-900 dark:text-sky-100 top-0 left-0 w-80 z-10 duration-300 border-r"
        :class="{'-translate-x-full': isCollapsed}"
        >
        <button @click="emit('collapse')">
@@ -39,6 +39,11 @@ const emit = defineEmits(['collapse'])
             Dodaj film
             </Link>
 
+            <Link class="flex justify-start items-center" :href="route('video.my')" v-if="$page.props.auth.user">
+            <svg-icon type="mdi" :path="mdiAccountDetails" />
+            Moje filmy
+            </Link>
+
 
             <!-- User Menu (Login/Profile) -->
               <template v-if="$page.props.auth.user">
@@ -49,11 +54,13 @@ const emit = defineEmits(['collapse'])
                 </Link>
               </template>
               <template v-else>
-                <Link :href="route('login')" class="hover:underline">
+                <Link :href="route('login')" class="flex justify-start items-center" >
                 <svg-icon type="mdi" :path="mdiLogin" />
+                Zaloguj się
                 </Link>
-                <Link :href="route('register')" class="hover:underline">
+                <Link :href="route('register')" class="flex justify-start items-center" >
                 <svg-icon type="mdi" :path="mdiAccountPlus" />
+                Zarejestruj się
                 </Link>
               </template>
 

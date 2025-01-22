@@ -4,6 +4,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\VideoController;
 use App\Models\User;
+use App\Models\Video;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,9 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::resource('video', VideoController::class, ['except' => ['index', 'show']]);
+
+    Route::get('video/my', [VideoController::class, 'myVideos'])->name('video.my');
+
     Route::post('video/upload', [VideoController::class, 'upload'])->name('video.upload');
 
     Route::prefix('video/{video}/rate')->controller(RateController::class)->group(function () {
@@ -30,7 +34,8 @@ Route::middleware([
     Route::resource('video/{video}/comments', CommentController::class, ['only' => ['store']]);
 });
 Route::get('/', function () {
-    return Inertia::render('Dashboard');
+    $lastVideos = Video::where('visibility', 'public')->orderBy('created_at', 'DESC')->take(6)->get();
+    return Inertia::render('Dashboard', ['last_videos' => $lastVideos]);
 })->name('dashboard');
 Route::resource('video', VideoController::class, ['only' => ['index', 'show']]);
 

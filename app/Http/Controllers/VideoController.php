@@ -134,6 +134,7 @@ class VideoController extends Controller
 
         }
         
+        touch($video->url);
 
 
         $video->url = asset($video->url);
@@ -142,6 +143,13 @@ class VideoController extends Controller
         $already_rated = ($request->user()) ? $video->rates()->where('user_id', $request->user()->id)->first()?->rate : null;
 
         return Inertia::render('Video/Show', ['video' => $video, 'already_rated' => $already_rated]);
+    }
+
+    public function myVideos(Request $request)
+    {
+        $videos = Video::whereBelongsTo($request->user(), 'author')->orderBy('created_at', 'DESC')->get();
+
+        return Inertia::render('Video/List', ['videos' => $videos]);
     }
 
     /**
@@ -240,7 +248,6 @@ class VideoController extends Controller
 
     protected function compressedPath($path, $name) {
         $hash = md5('storage/' . $path . $name);
-        Log::debug('storage/' . $path . $name, ['compressedPath']);
         return storage_path("app/compressed/$hash.zip");
     }
 

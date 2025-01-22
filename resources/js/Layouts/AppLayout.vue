@@ -8,7 +8,7 @@
       class="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300">
       <!-- Header -->
       <header class="bg-blue-600 dark:bg-gray-800 text-white shadow-md fixed top-0 inset-x-0 w-full">
-        <div class="px-4 py-4 flex items-center justify-between flex-wrap ">
+        <div class="px-4 flex items-center justify-between flex-wrap ">
 
 
 
